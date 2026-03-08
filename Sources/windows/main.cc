@@ -240,9 +240,15 @@ BOOL CALLBACK EnumDekstopWindowsProc(HWND hwnd, LPARAM lParam) {
 		WINDOWINFO winInfo{};
 		GetWindowInfo(hwnd, &winInfo);
 
+		const bool hasCaption = (winInfo.dwStyle & WS_CAPTION) == WS_CAPTION;
+		const bool hasPopup = (winInfo.dwStyle & WS_POPUP) == WS_POPUP;
+		const bool isOwnedWindow = GetWindow(hwnd, GW_OWNER) != NULL;
+		const bool isAppWindow = (winInfo.dwExStyle & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
+
 		if (
 			(winInfo.dwExStyle & WS_EX_TOOLWINDOW) == 0
-			&& (winInfo.dwStyle & WS_CAPTION) == WS_CAPTION
+			&& (hasCaption || hasPopup)
+			&& (!isOwnedWindow || isAppWindow)
 			&& (winInfo.dwStyle & WS_CHILD) == 0
 		) {
 			int ClockedVal;
